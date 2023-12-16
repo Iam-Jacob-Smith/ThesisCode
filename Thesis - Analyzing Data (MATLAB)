@@ -1,0 +1,67 @@
+clc
+
+fs = 1200; % 1200 Hz
+
+file_path = 'WVBF_20 Processed Data.xlsx';
+
+sheet_names = {'WVBF_20 Processed DL_DP', 'WVBF_20 Processed DL_MIX', 'WVBF_20 Processed BFDL_DP', 'WVBF_20 Processed BFDL_MIX'};
+%sheet_names = {'WVBF_20 Processed 10_BLS', 'WVBF_20 Processed 10_BF_BLS'};
+
+for i = 1:numel(sheet_names)
+    [num, ~, ~] = xlsread(file_path, sheet_names{i},'DB:DE'); % 'DB:DE' is the range from 106:109. AF:CE is for L and R Knee Joint Moment.
+    data{i} = [(1:1:length(num))', num(:, 1), num(:, end)];
+end
+
+% Plot the data for each sheet
+figure;
+for i = 1:numel(sheet_names)
+    figure;
+    plot(data{i}(:, 1), data{i}(:, 2), 'b', 'LineWidth', 1.5);  % Left_GRF_Z
+    hold on;
+    plot(data{i}(:, 1), data{i}(:, 3), 'r', 'LineWidth', 1.5);  % Right_GRF_Z
+    hold off;
+    xlabel('ITEM');
+    ylabel('Force');
+    title(sheet_names{i});
+    legend('Left_GRF', 'Right_GRF');
+    
+    % Let the user select indices for each plot
+    [x, ~] = ginput(10);  
+    start_indices{i} = x(1:2:end);
+    end_indices{i} = x(2:2:end);
+    
+    % Calculate the maximum and average values for each selected range
+    for j = 1:numel(start_indices{i})
+        range = round(start_indices{i}(j)):round(end_indices{i}(j));
+        eval(['max_values_' num2str(i) ' = [max(data{i}(range, 2)), max(data{i}(range, 3))];'])
+        eval(['avg_values_' num2str(i) ' = [mean(data{i}(range, 2)), mean(data{i}(range, 3))];'])
+        eval(['std_values_' num2str(i) ' = [std(data{i}(range, 2)), std(data{i}(range, 3))];'])
+    end  
+
+end
+
+% Write the calculated values to a new Excel file
+%Also make sure that max_values1-6 actually represent the number of trials being examined (i.e., if reading data from 3 trials, value # will need to represent this
+max_values = [max_values_1 max_values_2 max_values_3 max_values_4];
+avg_values = [avg_values_1 avg_values_2 avg_values_3 avg_values_4];
+std_values = [std_values_1 std_values_2 std_values_3 std_values_4];
+
+%max_values = [max_values_1 max_values_2];
+%avg_values = [avg_values_1 avg_values_2];
+%std_values = [std_values_1 std_values_2];
+
+sheet_names_max = {'DL_DP L Max/Avg', 'DL_DP R Max/Avg', 'DL_MIX L Max/Avg', 'DL_MIX R Max/Avg', 'BFDL_DP L Max/Avg', 'BFDL_DP R Max/Avg', 'BFDL_MIX L Max/Avg', 'BFDL_DP R Max/Avg'};
+%sheet_names_max = {'10_BLS L Max/Avg', '10_BLS R Max/Avg', '10_BF_BLS L Max/Avg', '10_BF_BLS R Max/Avg', 'BLS_Slow L Max/Avg', 'BLS_Slow R Max/Avg'};
+
+% Define the output file path
+output_file = 'WVBF_20_Deadlift_Force_Data';
+%output_file = 'WVBF_20_BLS_Force_Data';
+%output_file = 'WVBF_20_Deadlift_KneeTorque_Data';
+%output_file = 'WVBF_20_BLS_KneeTorque_Data';
+
+xlswrite(output_file, sheet_names_max, 'Sheet1', 'A1:H1');
+%xlswrite(output_file, sheet_names_max, 'Sheet1', 'A1:F1');
+
+xlswrite(output_file, max_values, 'Sheet1', 'A2');
+xlswrite(output_file, avg_values, 'Sheet1', 'A3');
+xlswrite(output_file, std_values, 'Sheet1', 'A4');
