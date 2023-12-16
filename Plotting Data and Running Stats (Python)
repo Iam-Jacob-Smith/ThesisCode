@@ -583,3 +583,75 @@ plt.legend(handles=legend_patches, loc="upper right", bbox_to_anchor=(1.25, 1))
 # Show the box plot
 plt.xticks(rotation=45)
 plt.show()
+
+
+
+
+
+#--------------------------------------------------------------------------------------#
+#Mixed ANOVA Results
+#--------------------------------------------------------------------------------------#
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from statsmodels.formula.api import mixedlm
+
+# Step 2 data
+step_2_data = np.array([
+    [13.86592791, 10.38887725, 19.87305564, 15.78628316, 19.07562003, 7.03725448],
+    [16.14866232, 3.42632883, 10.15692823, 5.84922281, 19.43922051, 5.88724362],
+    [8.752266, 2.42507143, 9.41122589, 5.68946334, 13.25010756, 8.02996573],
+    [14.88508052, 5.44753348, 16.9390042, 5.90667483, 19.30511447, 4.44997486],
+    [5.10242676, 0.55207071, 2.76299841, 1.85804348, 7.214669, 0.421941],
+    [15.26732963, 9.54195589, 10.83198789, 6.77164733, 14.4114713, 2.26422687],
+    [26.6302286, 16.99936995, 25.6220238, 10.81643791, 24.16483912, 5.73942033],
+    [14.05435897, 4.35137361, 13.5520292, 1.50661173, 12.03191529, 3.8257383],
+    [13.68019889, 7.06297758, 7.69945327, 1.43943507, 17.95442357, 7.0338689],
+    [5.28867734, 6.09170163, 10.07335348, 10.87089412, 12.55540582, 9.4883382],
+    [11.15978143, 2.22955217, 10.2767356, 0.09422861, 18.92893114, 9.89997723e-04],
+    [8.59483915, 4.07945171, 10.10591426, 0.01196061, 11.0404162, 2.75191257],
+    [15.73516416, 7.18436633, 14.26679376, 8.32114811, 17.91631248, 6.40286031]
+])
+
+# Step 1 data
+data = {
+    'Condition': ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+    'Symmetry_Score': step_2_data.transpose().tolist()  # Transpose the data
+}
+
+# Convert the data to a DataFrame
+df = pd.DataFrame({'Condition': np.repeat(data['Condition'], len(data['Symmetry_Score'][0])),
+                   'Symmetry_Score': np.concatenate(data['Symmetry_Score'])})
+
+# Add a new column for subject IDs
+df['Subject ID'] = np.tile(np.arange(1, df.shape[0] // 2 + 1), 2)
+
+# Rename the column to eliminate the space
+df.rename(columns={'Symmetry_Score': 'Symmetry_Score'}, inplace=True)
+
+# Perform mixed ANOVA
+model = mixedlm("Symmetry_Score ~ Condition", df, groups='Subject ID')
+result = model.fit()
+
+# Perform pairwise comparisons with Tukey's HSD
+posthoc = pairwise_tukeyhsd(df['Symmetry_Score'], df['Condition'])
+
+# Display ANOVA and posthoc results
+print("Mixed ANOVA Results:")
+print(result.summary())
+
+print("\nPairwise Comparisons with Tukey's HSD:")
+print(posthoc)
+
+# Display the results in a figure
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+# Plot the ANOVA results
+pg.qqplot(result.resid, ax=axes[0])
+
+# Plot the pairwise comparisons
+posthoc.plot_simultaneous(ax=axes[1])
+
+plt.tight_layout()
+plt.show()
