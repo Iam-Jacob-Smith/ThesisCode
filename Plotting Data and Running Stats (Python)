@@ -1,0 +1,585 @@
+
+#Plotting a single participant...............Code is Altered for subject 15 FYI
+import matplotlib.pyplot as plt
+
+# Sample data for one subject
+data = {
+    'Subject ID': 15,
+    'Condition': ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+    'Symmetry Score': [14.05435897, 4.351373613, 13.5520292, 1.506611732, 12.03191529, 3.825738298],
+}
+
+# Define custom colors with alternating light blue and pink (hexadecimal color codes)
+custom_colors = ['#ADD8E6', '#FFC0CB']  # Light Blue, Pink
+#custom_colors = ['#555555', '#D3D3D3']  # Dark Grey, Light Grey
+# Create a bar chart for the subject
+bars = plt.bar(data['Condition'], data['Symmetry Score'])
+
+# Find and annotate the maximum value for each bar
+for bar, score in zip(bars, data['Symmetry Score']):
+    plt.text(bar.get_x() + bar.get_width() / 2, score, f'{score:.2f}', ha='center', va='bottom', fontsize=10)
+
+# Set the title and axis labels
+plt.title(f"Subject {data['Subject ID']}")
+plt.xlabel("Condition")
+plt.ylabel("Symmetry Score")
+
+# Apply alternating custom colors to the bars
+for i, bar in enumerate(bars):
+    bar.set_color(custom_colors[i % len(custom_colors)])
+
+# Show the bar chart with the legend
+plt.show()
+
+#--------------------------------------------------------------------------------#
+#plotting all participants
+import matplotlib.pyplot as plt
+
+# Sample data for multiple subjects
+data = {
+    'Subject ID': [1, 2, 3, 4, 8],
+    'Condition': [
+        ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+        ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+        ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+        ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+        ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS']
+    ],
+    'Symmetry Score': [
+        [13.86592791, 10.38887725, 19.87305564, 15.78628316, 19.07562003, 7.037254481],#subject 1
+        [16.14866232, 3.426328834, 10.15692823, 5.84922281, 19.43922051, 5.887243622],#subject 2
+        [8.752265998, 2.425071431, 9.411225892, 5.68946334, 13.25010756, 8.029965731],#subject 3
+        [14.88508052, 5.447533475, 16.9390042, 5.906674834, 19.30511447, 4.449974859],#subject 4
+        [, , , , , ],#subject 5
+        [, , , , , ],#subject 6
+        [, , , , , ],#subject 7
+        [14.05435897, 4.351373613, 13.5520292, 1.506611732, 12.03191529, 3.825738298] #subject 8
+        [, , , , , ],#subject 9
+        [, , , , , ],#subject 10
+        [, , , , , ],#subject 11
+        [, , , , , ],#subject 12
+        [, , , , , ] #subject 13
+    ]
+}
+
+custom_colors = ['#ADD8E6', '#FFC0CB']  # Light Blue, Pink
+
+# Create a 2x2 subplot
+fig, axes = plt.subplots(3, 2, figsize=(10, 8))
+
+for i, ax in enumerate(axes.flat):
+    subject_data = data['Symmetry Score'][i]
+    subject_conditions = data['Condition'][i]
+    subject_id = data['Subject ID'][i]
+
+    # Create a bar chart for the subject
+    bars = ax.bar(subject_conditions, subject_data)
+
+    # Find and annotate the maximum value for each bar
+    for bar, score in zip(bars, subject_data):
+        ax.text(bar.get_x() + bar.get_width() / 2, score, f'{score:.2f}', ha='center', va='bottom', fontsize=10)
+
+    # Set the title and axis labels for each subplot
+    ax.set_title(f"Subject {subject_id}")
+    ax.set_xlabel("Condition")
+    ax.set_ylabel("VGRF Symmetry Score")
+
+    # Apply alternating custom colors to the bars
+    for j, bar in enumerate(bars):
+        bar.set_color(custom_colors[j % len(custom_colors)])
+
+    # Rotate x-axis labels by 45 degrees
+    ax.tick_params(axis='x', rotation=45)
+
+    # Set the y-limit to 22
+    ax.set_ylim(0, 22)
+    
+# Add a legend to indicate colors
+legend_labels = ['Trials without BF', 'Trials with BF']
+legend_colors = custom_colors  # Use the same colors
+legend_patches = [plt.Line2D([0], [0], marker='s', color='w', label=label, markersize=10, markerfacecolor=color) for label, color in zip(legend_labels, legend_colors)]
+plt.legend(handles=legend_patches, loc="upper right", bbox_to_anchor=(1.55, 1))
+
+# Adjust layout and display the subplots
+plt.tight_layout()
+plt.show()
+
+#--------------------------------------------------------------------------------#
+#plotting boxplots for all subjects to compare trials across all subjects
+import matplotlib.pyplot as plt
+
+# Sample data PLEASE NOTE: each line in the symmetry score list contains variables that are related to the trail name.
+# For example, the first line contains SI scores for all subjects (in order i.e., subject 1,2,3, ...) in trial DL_MIX. This repeats for lines 1-6 because there
+# are 6 trials. The length of each line will increase when more participants data are collected. 
+data = {
+    'Subject ID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    'Condition': [
+        'DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'
+    ],
+    'Symmetry Score': [
+        [13.86592791, 16.14866232, 8.752265998, 14.88508052, 5.102426758, 15.26732963, 26.6302286, 14.05435897, 13.68019889, 5.28867734, 11.15978143, 8.594839153, 15.73516416], #DL MIX The last vertical column in this list constains subject 15 data. adjust once 12-14 data is analyzed 
+        [10.38887725, 3.426328834, 2.425071431, 5.447533475, 0.5520707055, 9.541955889, 16.99936995, 4.351373613, 7.062977584, 6.091701634, 2.22955217, 4.079451706, 7.184366328], #BFDL_MIX
+        [19.87305564, 10.15692823, 9.411225892, 16.9390042, 2.762998409, 10.83198789, 25.6220238, 13.5520292, 7.699453266, 10.07335348, 10.27673564, 10.10591426, 14.26679376], #DL_DO
+        [15.78628316, 5.84922281, 5.68946334, 5.906674834, 1.858043482, 6.771647328, 10.81643791, 1.506611732, 1.439435071, 10.87089412, 0.0942286124, 0.01196061182, 8.321148114], #BFDL_DO
+        [19.07562003, 19.43922051, 13.25010756, 19.30511447, 7.214669004, 14.4114713, 24.16483912, 12.03191529, 17.95442357, 12.55540582, 18.92893114, 11.0404162, 17.91631248], #BLS
+        [7.037254481, 5.887243622, 8.029965731, 4.449974859, 0.4219410047, 2.26422687, 5.739420329, 3.825738298, 7.033868895, 9.488338202, 0.000989997723, 2.751912568, 6.402860311] #BF_BLS
+    ]
+}
+
+# Custom colors for the boxes
+box_colors = ['lightblue', 'pink', 'lightblue', 'pink', 'lightblue', 'pink']
+
+# Create a box plot for comparing trials across all subjects
+plt.figure(figsize=(10, 6))
+boxplot = plt.boxplot(data['Symmetry Score'], labels=data['Condition'], vert=True, patch_artist=True)
+
+# Set custom colors for boxes
+for box, color in zip(boxplot['boxes'], box_colors):
+    box.set(color='black', linewidth=2)
+    box.set(facecolor=color)
+
+# Set labels and title
+plt.xlabel("Condition")
+plt.ylabel("VGRF Symmetry Score")
+plt.title("VGRF Symmetry Scores Across Conditions")
+
+# Add a legend for boxplot colors outside the graph
+legend_labels = ['Trials without BF', 'Trials with BF']
+legend_colors = ['lightblue', 'pink']
+legend_patches = [plt.Line2D([0], [0], marker='s', color='w', label=label, markersize=10, markerfacecolor=color) for label, color in zip(legend_labels, legend_colors)]
+plt.legend(handles=legend_patches, loc="upper right", bbox_to_anchor=(1.25, 1))
+
+# Show the box plot
+plt.xticks(rotation=45)
+plt.show()
+
+
+#----------------------------------#
+import matplotlib.pyplot as plt
+
+# Sample data for one subject
+data = {
+    'Subject ID': 1,
+    'Condition': ['BLS Slow'],
+    'Symmetry Score': [15.95868738]
+}
+
+# Define custom colors with alternating light blue and pink (hexadecimal color codes)
+custom_colors = ['#ADD8E6']  # Light Blue, Pink
+#custom_colors = ['#555555', '#D3D3D3']  # Dark Grey, Light Grey
+# Create a bar chart for the subject
+bars = plt.bar(data['Condition'], data['Symmetry Score'])
+
+# Find and annotate the maximum value for each bar
+for bar, score in zip(bars, data['Symmetry Score']):
+    plt.text(bar.get_x() + bar.get_width() / 2, score, f'{score:.2f}', ha='center', va='bottom', fontsize=10)
+
+# Set the title and axis labels
+plt.title(f"Subject {data['Subject ID']}")
+plt.xlabel("Condition")
+plt.ylabel("Symmetry Score")
+
+# Apply alternating custom colors to the bars
+for i, bar in enumerate(bars):
+    bar.set_color(custom_colors[i % len(custom_colors)])
+
+# Show the bar chart with the legend
+plt.show()
+
+
+
+#--------------------------------------------------------------------------------------------------#
+# Running an ANOVA with VGRF Data #
+#--------------------------------------------------------------------------------------------------#
+
+import pandas as pd
+import numpy as np
+import pingouin as pg
+
+# Create a DataFrame from your data
+data = {
+    'Subject_ID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    'Condition': [
+        'DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'
+    ],
+    'Symmetry_Score': [
+        [13.86592791, 16.14866232, 8.752265998, 14.88508052, 5.102426758, 15.26732963, 26.6302286, 14.05435897, 13.68019889, 5.28867734, 11.15978143, 8.594839153, 15.73516416],  # DL MIX
+        [10.38887725, 3.426328834, 2.425071431, 5.447533475, 0.5520707055, 9.541955889, 16.99936995, 4.351373613, 7.062977584, 6.091701634, 2.22955217, 4.079451706, 7.184366328],  # BFDL_MIX
+        [19.87305564, 10.15692823, 9.411225892, 16.9390042, 2.762998409, 10.83198789, 25.6220238, 13.5520292, 7.699453266, 10.07335348, 10.27673564, 10.10591426, 14.26679376],  # DL_DO
+        [15.78628316, 5.84922281, 5.68946334, 5.906674834, 1.858043482, 6.771647328, 10.81643791, 1.506611732, 1.439435071, 10.87089412, 0.0942286124, 0.01196061182, 8.321148114],  # BFDL_DO
+        [19.07562003, 19.43922051, 13.25010756, 19.30511447, 7.214669004, 14.4114713, 24.16483912, 12.03191529, 17.95442357, 12.55540582, 18.92893114, 11.0404162, 17.91631248],  # BLS
+        [7.037254481, 5.887243622, 8.029965731, 4.449974859, 0.4219410047, 2.26422687, 5.739420329, 3.825738298, 7.033868895, 9.488338202, 0.000989997723, 2.751912568, 6.402860311]  # BF_BLS
+    ]
+}
+
+# Create a list to store rows of data
+rows = []
+
+# Iterate through subjects, conditions, and symmetry scores
+for i, subject_id in enumerate(data['Subject_ID']):
+    for j, condition in enumerate(data['Condition']):
+        symmetry_score = data['Symmetry_Score'][j][i]
+        rows.append([subject_id, condition, symmetry_score])
+
+# Create a DataFrame from the rows
+df_long = pd.DataFrame(rows, columns=['Subject_ID', 'Condition', 'Symmetry_Score'])
+
+# Conduct repeated measures ANOVA using pingouin
+rm_anova = pg.rm_anova(dv='Symmetry_Score', within='Condition', subject='Subject_ID', data=df_long)
+
+# Display the ANOVA table
+print(rm_anova)
+
+
+#--------------------------------------------------------------------------------------------------#
+# Running a two-way mixed model ANOVA with Knee Torque Data #
+#--------------------------------------------------------------------------------------------------#
+import pandas as pd
+import numpy as np
+import pingouin as pg
+
+# Create a DataFrame from your data
+data = {
+    'Subject_ID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    'Condition': [
+        'DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'
+    ],
+    'Symmetry_Score': [
+        [13.86592791, 16.14866232, 8.752265998, 14.88508052, 5.102426758, 15.26732963, 26.6302286, 14.05435897, 13.68019889, 5.28867734, 11.15978143, 8.594839153, 15.73516416],  # DL MIX
+        [10.38887725, 3.426328834, 2.425071431, 5.447533475, 0.5520707055, 9.541955889, 16.99936995, 4.351373613, 7.062977584, 6.091701634, 2.22955217, 4.079451706, 7.184366328],  # BFDL_MIX
+        [19.87305564, 10.15692823, 9.411225892, 16.9390042, 2.762998409, 10.83198789, 25.6220238, 13.5520292, 7.699453266, 10.07335348, 10.27673564, 10.10591426, 14.26679376],  # DL_DO
+        [15.78628316, 5.84922281, 5.68946334, 5.906674834, 1.858043482, 6.771647328, 10.81643791, 1.506611732, 1.439435071, 10.87089412, 0.0942286124, 0.01196061182, 8.321148114],  # BFDL_DO
+        [19.07562003, 19.43922051, 13.25010756, 19.30511447, 7.214669004, 14.4114713, 24.16483912, 12.03191529, 17.95442357, 12.55540582, 18.92893114, 11.0404162, 17.91631248],  # BLS
+        [7.037254481, 5.887243622, 8.029965731, 4.449974859, 0.4219410047, 2.26422687, 5.739420329, 3.825738298, 7.033868895, 9.488338202, 0.000989997723, 2.751912568, 6.402860311]  # BF_BLS
+    ],
+    'Group': ['Control', 'BF', 'Control', 'BF', 'Control', 'BF', 'Control', 'BF', 'Control', 'BF', 'Control', 'BF', 'Control', 'BF']  # Add your actual group data here
+}
+
+# Create a list to store rows of data
+rows = []
+
+# Iterate through subjects, conditions, groups, and symmetry scores
+for i, subject_id in enumerate(data['Subject_ID']):
+    for j, condition in enumerate(data['Condition']):
+        symmetry_score = data['Symmetry_Score'][j][i]
+        group = data['Group'][i]
+        rows.append([subject_id, condition, group, symmetry_score])
+
+# Create a DataFrame from the rows
+df_long = pd.DataFrame(rows, columns=['Subject_ID', 'Condition', 'Group', 'Symmetry_Score'])
+
+# Conduct two-way mixed model ANOVA using pingouin
+mixed_anova = pg.mixed_anova(data=df_long, dv='Symmetry_Score', within='Condition', subject='Subject_ID', between='Group')
+
+# Display the ANOVA table
+print(mixed_anova)
+
+
+#------------------------------------------------------------------------------------------------------------------------------------#
+# Twoway mixed model anova that includes a pairwise comparisions with a Games-Howell correction
+#------------------------------------------------------------------------------------------------------------------------------------#
+
+import pandas as pd
+import numpy as np
+import pingouin as pg
+
+# Create a DataFrame from your data
+data = {
+    'Subject_ID': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+    'Condition': [
+        'DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'
+    ],
+    'Symmetry_Score': [
+        [13.86592791, 16.14866232, 8.752265998, 14.88508052, 5.102426758, 15.26732963, 26.6302286, 14.05435897, 13.68019889, 5.28867734, 11.15978143, 8.594839153, 15.73516416],  # DL MIX
+        [10.38887725, 3.426328834, 2.425071431, 5.447533475, 0.5520707055, 9.541955889, 16.99936995, 4.351373613, 7.062977584, 6.091701634, 2.22955217, 4.079451706, 7.184366328],  # BFDL_MIX
+        [19.87305564, 10.15692823, 9.411225892, 16.9390042, 2.762998409, 10.83198789, 25.6220238, 13.5520292, 7.699453266, 10.07335348, 10.27673564, 10.10591426, 14.26679376],  # DL_DO
+        [15.78628316, 5.84922281, 5.68946334, 5.906674834, 1.858043482, 6.771647328, 10.81643791, 1.506611732, 1.439435071, 10.87089412, 0.0942286124, 0.01196061182, 8.321148114],  # BFDL_DO
+        [19.07562003, 19.43922051, 13.25010756, 19.30511447, 7.214669004, 14.4114713, 24.16483912, 12.03191529, 17.95442357, 12.55540582, 18.92893114, 11.0404162, 17.91631248],  # BLS
+        [7.037254481, 5.887243622, 8.029965731, 4.449974859, 0.4219410047, 2.26422687, 5.739420329, 3.825738298, 7.033868895, 9.488338202, 0.000989997723, 2.751912568, 6.402860311]  # BF_BLS
+    ],
+    'Group': ['A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B']  # Add your actual group data here
+}
+
+# Create a list to store rows of data
+rows = []
+
+# Iterate through subjects, conditions, groups, and symmetry scores
+for i, subject_id in enumerate(data['Subject_ID']):
+    for j, condition in enumerate(data['Condition']):
+        symmetry_score = data['Symmetry_Score'][j][i]
+        group = data['Group'][i]
+        rows.append([subject_id, condition, group, symmetry_score])
+
+# Create a DataFrame from the rows
+df_long = pd.DataFrame(rows, columns=['Subject_ID', 'Condition', 'Group', 'Symmetry_Score'])
+
+# Conduct two-way mixed model ANOVA using pingouin
+mixed_anova = pg.mixed_anova(data=df_long, dv='Symmetry_Score', within='Condition', subject='Subject_ID', between='Group', correction=True)
+
+# Display the ANOVA table
+print(mixed_anova)
+
+# Perform pairwise comparisons with Games-Howell correction
+posthoc = pg.pairwise_gameshowell(data=df_long, dv='Symmetry_Score', between='Condition', effsize='eta-square')
+# Display the pairwise comparison results
+print(posthoc)
+
+#------------------------------------------------------------------------------------------------------------------------------------#
+# Twoway mixed model anova that includes a pairwise comparisions with a Games-Howell correction and displays the output table as a figure
+#------------------------------------------------------------------------------------------------------------------------------------#
+import plotly.graph_objects as go
+
+# Two-Way Mixed Model ANOVA Results
+mixed_anova_results = {
+    'Source': ['Group', 'Condition', 'Interaction'],
+    'SS': [24.397002, 1416.046361, 6.389000],
+    'DF1': [1, 5, 5],
+    'DF2': [11, 55, 55],
+    'MS': [24.397002, 283.209272, 1.277800],
+    'F': [0.264983, 26.255309, 0.118460],
+    'p-unc': [0.617, 1.890e-13, 0.988],
+    'np2': [0.023523, 0.704740, 0.010654],
+    'eps': [None, 0.548312, None],
+    'Sphericity': [None, True, None],
+    'W-spher': [None, 0.132779, None],
+    'p-spher': [None, 0.127508, None]
+}
+
+# Pairwise Comparisons Results
+pairwise_results = {
+    'Comparison': ['BF BLS vs. BFDL DO', 'BF BLS vs. BFDL MIX', 'BF BLS vs. BLS', 'BF BLS vs. DL DO', 'BF BLS vs. DL MIX',
+                    'BFDL DO vs. BFDL MIX', 'BFDL DO vs. BLS', 'BFDL DO vs. DL DO', 'BFDL DO vs. DL MIX',
+                    'BFDL MIX vs. BLS', 'BFDL MIX vs. DL DO', 'BFDL MIX vs. DL MIX', 'BLS vs. DL DO', 'BLS vs. DL MIX', 'DL DO vs. DL MIX'],
+    'Mean_A': [4.871826, 4.871826, 4.871826, 4.871826, 4.871826, 5.763235, 5.763235, 5.763235, 5.763235, 6.136972, 6.136972, 6.136972, 15.945265, 15.945265, 12.428577],
+    'Mean_B': [5.763235, 6.136972, 15.945265, 12.428577, 13.012688, 6.136972, 15.945265, 12.428577, 13.012688, 15.945265, 12.428577, 13.012688, 12.428577, 13.012688, 13.012688],
+    'Diff': [-0.891409, -1.265146, -11.073439, -7.556751, -8.140862, -0.373737, -10.182030, -6.665343, -7.249453, -9.808294, -6.291606, -6.875716, 3.516688, 2.932577, -0.584111],
+    'SE': [1.556267, 1.445534, 1.509061, 1.796572, 1.749974, 1.793971, 1.845543, 2.087207, 2.047236, 1.753177, 2.006000, 1.964376, 2.052250, 2.011584, 2.235369],
+    'T': [-0.572787, -0.875210, -7.337967, -4.206207, -4.651991, -0.208329, -5.517091, -3.193426, -3.541094, -5.594582, -3.136394, -3.500203, 1.713576, 1.457845, -0.261304],
+    'DF': [11, 22.837115, 23.129224, 23.973777, 23.973777, 22.565719, 23.129224, 23.973777, 23.973777, 23.129224, 23.973777, 23.973777, 22.837115, 23.129224, 23.973777],
+    'p-unc': [0.537147, 6.230411e-09, 0.692838, 0.999811, 0.021225, 0.999811, 0.002619, 0.537147, 0.999811, 2.225e-08, 5.351e-06, 1.049e-07, 0.537147, 0.692838, 0.999811],
+    'Cohen_d': [0.101476, 7.638, 0.075566, 0.002619, 0.320287, 0.101476, 0.075566, 0.002619, 0.002619, 0.320287, 0.075566, 0.002619, 0.101476, 0.075566, 0.002619]
+}
+
+# Create tables
+mixed_anova_table = go.Figure(data=[go.Table(
+    header=dict(values=list(mixed_anova_results.keys())),
+    cells=dict(values=[mixed_anova_results[col] for col in mixed_anova_results.keys()])
+)])
+
+pairwise_table = go.Figure(data=[go.Table(
+    header=dict(values=list(pairwise_results.keys())),
+    cells=dict(values=[pairwise_results[col] for col in pairwise_results.keys()])
+)])
+
+# Display tables
+mixed_anova_table.show()
+pairwise_table.show()
+
+
+#------------------------------------------------------------------------------------------------------------------------------------#
+# Plots boxplot of symmetry scores
+#------------------------------------------------------------------------------------------------------------------------------------#
+
+import plotly.express as px
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Set the Seaborn theme
+sns.set_theme()
+
+# Create a box plot using Plotly Express
+fig = px.box(df_long, x='Condition', y='Symmetry_Score', color='Group', points="all", title="Symmetry Scores Across Conditions")
+fig.update_layout(
+    xaxis_title='Condition',
+    yaxis_title='Symmetry Score',
+    boxmode='group',
+    showlegend=True
+)
+
+# Show the plot
+fig.show()
+
+# Alternatively, you can use Seaborn to create a similar box plot
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df_long, x='Condition', y='Symmetry_Score', hue='Group', showfliers=False)
+plt.title('VGRF Symmetry Scores Across Conditions')
+plt.xlabel('Condition')
+plt.ylabel('VGRF Symmetry Score')
+plt.show()
+
+#------------------------------------------------------------------------------------------------------------------------------------#
+#Using the Excel file to run stats. 
+#------------------------------------------------------------------------------------------------------------------------------------#
+
+
+import pandas as pd
+import pingouin as pg
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the Excel file
+file_path = "C:\Users\jacob\Documents\Research\IMU Biofeedback Project\Stats\WVBF_STATS.xlsx"
+df = pd.read_excel(file_path)
+
+# Perform two-way mixed model ANOVA
+mixed_anova = pg.mixed_anova(
+    data=df, dv='VGRF Symmetry Score', within='Trial', subject='Subject ID', between='Condition'
+)
+
+# Perform pairwise comparisons with Bonferroni correction
+posthoc = pg.pairwise_tukey(data=df, dv='Dependent Variable', between='Exercise', effsize='eta-square', correction=True)
+
+# Display the results
+print("Two-way Mixed Model ANOVA Results:")
+print(mixed_anova)
+print("\nPairwise Comparison Results:")
+print(posthoc)
+
+# Boxplot
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='Exercise', y='Dependent Variable', hue='Condition', data=df)
+plt.title('VGRF Symmetry Score Across Exercises and Conditions')
+plt.xlabel('Exercise')
+plt.ylabel('VGRF Symmetry Score')
+plt.legend(title='Condition')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+from statsmodels.formula.api import mixedlm
+
+# Step 2 data
+step_2_data = np.array([
+    [13.86592791, 10.38887725, 19.87305564, 15.78628316, 19.07562003, 7.03725448],
+    [16.14866232, 3.42632883, 10.15692823, 5.84922281, 19.43922051, 5.88724362],
+    [8.752266, 2.42507143, 9.41122589, 5.68946334, 13.25010756, 8.02996573],
+    [14.88508052, 5.44753348, 16.9390042, 5.90667483, 19.30511447, 4.44997486],
+    [5.10242676, 0.55207071, 2.76299841, 1.85804348, 7.214669, 0.421941],
+    [15.26732963, 9.54195589, 10.83198789, 6.77164733, 14.4114713, 2.26422687],
+    [26.6302286, 16.99936995, 25.6220238, 10.81643791, 24.16483912, 5.73942033],
+    [14.05435897, 4.35137361, 13.5520292, 1.50661173, 12.03191529, 3.8257383],
+    [13.68019889, 7.06297758, 7.69945327, 1.43943507, 17.95442357, 7.0338689],
+    [5.28867734, 6.09170163, 10.07335348, 10.87089412, 12.55540582, 9.4883382],
+    [11.15978143, 2.22955217, 10.2767356, 0.09422861, 18.92893114, 9.89997723e-04],
+    [8.59483915, 4.07945171, 10.10591426, 0.01196061, 11.0404162, 2.75191257],
+    [15.73516416, 7.18436633, 14.26679376, 8.32114811, 17.91631248, 6.40286031]
+])
+
+# Step 1 data
+data = {
+    'Condition': ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
+    'Symmetry_Score': step_2_data.transpose().tolist()  # Transpose the data
+}
+
+# Convert the data to a DataFrame
+df = pd.DataFrame({'Condition': np.repeat(data['Condition'], len(data['Symmetry_Score'][0])),
+                   'Symmetry_Score': np.concatenate(data['Symmetry_Score'])})
+
+# Add a new column for subject IDs
+df['Subject ID'] = np.tile(np.arange(1, df.shape[0] // 2 + 1), 2)
+
+# Rename the column to eliminate the space
+df.rename(columns={'Symmetry_Score': 'Symmetry_Score'}, inplace=True)
+
+# Perform mixed ANOVA
+model = mixedlm("Symmetry_Score ~ Condition", df, groups='Subject ID')
+result = model.fit()
+
+# Perform pairwise comparisons with Tukey's HSD
+posthoc = pairwise_tukeyhsd(df['Symmetry_Score'], df['Condition'])
+
+# Display ANOVA and posthoc results
+print("Mixed ANOVA Results:")
+print(result.summary())
+
+print("\nPairwise Comparisons with Tukey's HSD:")
+print(posthoc)
+
+# Display the results in a figure
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+# Plot the ANOVA results
+pg.plot_paired(data=df, dv='Symmetry_Score', within='Condition', between='Subject ID', ax=axes[0])
+
+# Plot the pairwise comparisons
+posthoc.plot_simultaneous(ax=axes[1])
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Step 2 data
+step_2_data = np.array([
+    [13.86592791, 10.38887725, 19.87305564, 15.78628316, 19.07562003, 7.03725448],
+    [16.14866232, 3.42632883, 10.15692823, 5.84922281, 19.43922051, 5.88724362],
+    [8.752266, 2.42507143, 9.41122589, 5.68946334, 13.25010756, 8.02996573],
+    [14.88508052, 5.44753348, 16.9390042, 5.90667483, 19.30511447, 4.44997486],
+    [5.10242676, 0.55207071, 2.76299841, 1.85804348, 7.214669, 0.421941],
+    [15.26732963, 9.54195589, 10.83198789, 6.77164733, 14.4114713, 2.26422687],
+    [26.6302286, 16.99936995, 25.6220238, 10.81643791, 24.16483912, 5.73942033],
+    [14.05435897, 4.35137361, 13.5520292, 1.50661173, 12.03191529, 3.8257383],
+    [13.68019889, 7.06297758, 7.69945327, 1.43943507, 17.95442357, 7.0338689],
+    [5.28867734, 6.09170163, 10.07335348, 10.87089412, 12.55540582, 9.4883382],
+    [11.15978143, 2.22955217, 10.2767356, 0.09422861, 18.92893114, 0.00098999],
+    [8.59483915, 4.07945171, 10.10591426, 0.01196061, 11.0404162, 2.75191257],
+    [15.73516416, 7.18436633, 14.26679376, 8.32114811, 17.91631248, 6.40286031]
+])
+
+# Step 1
+# Box plot data
+data = {
+    'Condition': [
+        'DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'
+    ],
+    'Symmetry Score': step_2_data.transpose().tolist()  # Transpose the data
+}
+
+# Custom colors for the boxes
+box_colors = ['lightblue', 'pink', 'lightblue', 'pink', 'lightblue', 'pink']
+
+# Create a box plot for comparing trials across all subjects
+plt.figure(figsize=(10, 6))
+boxplot = plt.boxplot(data['Symmetry Score'], labels=data['Condition'], vert=True, patch_artist=True)
+
+# Set custom colors for boxes
+for box, color in zip(boxplot['boxes'], box_colors):
+    box.set(color='black', linewidth=2)
+    box.set(facecolor=color)
+
+# Set labels and title
+plt.xlabel("Condition")
+plt.ylabel("VGRF Symmetry Score")
+plt.title("VGRF Symmetry Scores Across Conditions")
+
+# Add a legend for boxplot colors outside the graph
+legend_labels = ['Trials without BF', 'Trials with BF']
+legend_colors = ['lightblue', 'pink']
+legend_patches = [plt.Line2D([0], [0], marker='s', color='w', label=label, markersize=10, markerfacecolor=color) for label, color in zip(legend_labels, legend_colors)]
+plt.legend(handles=legend_patches, loc="upper right", bbox_to_anchor=(1.25, 1))
+
+# Show the box plot
+plt.xticks(rotation=45)
+plt.show()
