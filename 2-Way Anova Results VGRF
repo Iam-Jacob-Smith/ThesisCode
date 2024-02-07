@@ -5,7 +5,6 @@ from statsmodels.formula.api import mixedlm
 import numpy as np
 import pingouin as pg
 
-# Step 2 data
 step_2_data = np.array([
     [13.86592791, 10.38887725, 19.87305564, 15.78628316, 19.07562003, 7.03725448],
     [16.14866232, 3.42632883, 10.15692823, 5.84922281, 19.43922051, 5.88724362],
@@ -22,44 +21,33 @@ step_2_data = np.array([
     [15.73516416, 7.18436633, 14.26679376, 8.32114811, 17.91631248, 6.40286031]
 ])
 
-# Step 1 data
 data = {
     'Condition': ['DL MIX', 'BFDL MIX', 'DL DO', 'BFDL DO', 'BLS', 'BF BLS'],
     'Symmetry_Score': step_2_data.transpose().tolist()  # Transpose the data
 }
 
-# Convert the data to a DataFrame
 df = pd.DataFrame({'Condition': np.repeat(data['Condition'], len(data['Symmetry_Score'][0])),
                    'Symmetry_Score': np.concatenate(data['Symmetry_Score'])})
 
 # Add a new column for subject IDs
 df['Subject ID'] = np.tile(np.arange(1, df.shape[0] // 2 + 1), 2)
-
-# Rename the column to eliminate the space
 df.rename(columns={'Symmetry_Score': 'Symmetry_Score'}, inplace=True)
-
-# Perform mixed ANOVA
+#mixed ANOVA
 model = mixedlm("Symmetry_Score ~ Condition", df, groups='Subject ID')
 result = model.fit()
-
-# Perform pairwise comparisons with Tukey's HSD
+#pairwise comparisons with Tukey's HSD
 posthoc = pairwise_tukeyhsd(df['Symmetry_Score'], df['Condition'])
 
-# Display ANOVA and posthoc results
+#ANOVA and posthoc results
 print("Mixed ANOVA Results:")
 print(result.summary())
-
 print("\nPairwise Comparisons with Tukey's HSD:")
 print(posthoc)
 
-# Display the results in a figure
 fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-
-# Plot the ANOVA results
+#ANOVA results
 pg.qqplot(result.resid, ax=axes[0])
-
-# Plot the pairwise comparisons
+#pairwise comparisons
 posthoc.plot_simultaneous(ax=axes[1])
-
 plt.tight_layout()
 plt.show()
