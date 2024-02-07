@@ -9,7 +9,7 @@ data = {
     'Symmetry Score': [14.05435897, 4.351373613, 13.5520292, 1.506611732, 12.03191529, 3.825738298],
 }
 
-# Define custom colors with alternating light blue and pink (hexadecimal color codes)
+# Define custom colors with alternating light blue and pink
 custom_colors = ['#ADD8E6', '#FFC0CB']  # Light Blue, Pink
 #custom_colors = ['#555555', '#D3D3D3']  # Dark Grey, Light Grey
 # Create a bar chart for the subject
