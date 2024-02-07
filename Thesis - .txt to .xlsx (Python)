@@ -4,13 +4,10 @@ from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import NamedStyle
 
-# Folder containing text files
 folder_path = r"C:\Users\jacob\Documents\Research\IMU Biofeedback Project\Data\WVBF_08\Processed Data"
-
-# List of text file names (assuming all files in the folder are relevant)
 text_files = [os.path.join(folder_path, filename) for filename in os.listdir(folder_path) if filename.endswith(".txt")]
 
-# Mapping of text file names to sheet names
+#text file names to sheet names
 sheet_names = [
     
     "WVBF_08 Processed 10_BF_BLS",
@@ -30,38 +27,29 @@ sheet_names = [
     "WVBF_08 Processed Jump_4",
 ]
 
-# New Excel file location
+#New Excel file location
 excel_file = os.path.join(folder_path, "WVBF_08 Processed Data.xlsx")
-
-# Create a new Excel workbook
+#New excel workbook
 wb = Workbook()
-
 # Define a named style with '0' number format to convert to numbers
 number_style = NamedStyle(name='number_style', number_format='0')
 
-# Iterate through the text files and add data to the corresponding sheets
 for file_name, sheet_name in zip(text_files, sheet_names):
     # Read the text file into a DataFrame
     df = pd.read_csv(file_name, delimiter="\t")  # Adjust delimiter as needed
-
     # Create a new sheet with the specified name
     ws = wb.create_sheet(title=sheet_name)
-
     # Convert the DataFrame to a list of lists
     data = dataframe_to_rows(df, index=False, header=True)
-    
-    # Add the data to the sheet and apply the number format
+    # Add data to sheet and apply the number format
     for row_idx, row_data in enumerate(data, start=1):
         ws.append(row_data)
         for col_idx, cell in enumerate(ws[row_idx], start=1):
             cell.style = number_style  # Apply the number format to the cell
 
-# Remove the default sheet created by openpyxl
+# remove default sheet 
 wb.remove(wb.active)
-
-# Save the Excel workbook
 wb.save(excel_file)
-
 print(f"Data from {len(text_files)} text files in '{folder_path}' has been written to separate sheets in {excel_file}.")
 
 
