@@ -1,0 +1,73 @@
+from __future__ import print_function
+import vicon_dssdk
+import time
+from collections import deque
+import pyqtgraph as pg
+from pyqtgraph.Qt import QtWidgets
+import numpy as np
+
+import os
+os.chdir('C:\\Program Files\\Vicon\\DataStream SDK\\Win64\\Python\\vicon_dssdk')
+import vicon_dssdk
+from vicon_dssdk import ViconDataStream
+
+client = ViconDataStream.Client()
+client.Connect( 'localhost:801' )
+client.EnableDeviceData()
+client.SetStreamMode( ViconDataStream.Client.StreamMode.EServerPush )
+
+print("What's the tolerable symmetry error range(%)?")
+b=input()
+b=float(b)
+print("What's graph Y-axis range(%)?")
+c=input()
+c=float(c)
+
+app=QtWidgets.QApplication([])
+view = pg.GraphicsView()
+view.show()
+p1 = pg.PlotItem()
+view.setCentralItem(p1)
+
+curve1=p1.plot()
+curve2=p1.plot()
+curve3=p1.plot()
+fill = pg.FillBetweenItem(curve2, curve3, brush='g')
+p1.addItem(fill)
+
+
+p1.setYRange(c,c*-1)
+p1.setXRange(0,100)
+
+Fz_asym = deque([],maxlen=100)
+
+f_up1 = np.ones(100)*(0+b/2)
+f_lo1 = np.ones(100)*(0-b/2)
+curve2.setData(f_up1, pen=pg.mkPen('g',width=5))
+curve3.setData(f_lo1, pen=pg.mkPen('g',width=5))
+
+
+try:
+    while client.IsConnected():
+        if client.GetFrame():
+
+            start = time.time()
+            f3, occluded=client.GetDeviceOutputValues('Plate 4','Force','Fz')
+            f4, occluded=client.GetDeviceOutputValues('Plate 7','Force','Fz')
+
+            Fz_R = float(f3[0])
+            Fz_L = float(f4[0])
+            if Fz_R + Fz_L !=0:
+                Fz_asym_realtime = ((Fz_R - Fz_L) / (Fz_R+Fz_L))*100
+            else:
+                Fz_asym_realtime = ((Fz_R - Fz_L) / 1)*100
+
+            Fz_asym.append(Fz_asym_realtime)
+            curve1.setData(Fz_asym, pen=pg.mkPen('b', width=5))
+
+            
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+
+except ViconDataStream.DataStreamException as e:
+    print( 'Error', e )
